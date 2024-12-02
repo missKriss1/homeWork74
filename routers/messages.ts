@@ -1,6 +1,6 @@
 import express from "express";
 import {Message} from "../types";
-import * as fs from "fs/promises";
+import {promises as fs} from 'fs';
 
 const path = './messages';
 
@@ -10,13 +10,14 @@ messagesRouter.get('/',async (req, res) => {
     const messagesAll: Message[] = []
 
     const messagesFiles = await fs.readdir(path);
-    let messages = null;
+    let message = null
 
     for (const file of messagesFiles) {
-        messages = fs.readFile(`${path}/${file}`, 'utf8');
-        messagesAll.push(JSON.parse(await messages));
+        message = fs.readFile(`${path}/${file}`, 'utf-8');
+        messagesAll.push(JSON.parse(await message));
     }
-    res.send(messagesAll.reverse().slice(0,5));
+    const messagesFromReverse = [...messagesAll].reverse();
+    res.send(messagesFromReverse.slice(0,5));
 })
 
 messagesRouter.post('/', async (req, res) => {
@@ -27,6 +28,7 @@ messagesRouter.post('/', async (req, res) => {
     }
     await fs.writeFile(`${path}/${data}.txt`, JSON.stringify(messages));
     res.send(messages);
+
 })
 
 export default messagesRouter;
